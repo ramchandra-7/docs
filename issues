@@ -1,0 +1,887 @@
+Dl upgrade issues: 
+
+datalake upgrade 
+
+  
+
+freeipa,ccm,dl,dh – correct sequence 
+
+ 
+
+  
+
+Failed to repair cluster. Reason: Operation timed out. Could not reach bootstrap API in time.  
+
+The Control Plane was not able to establish the connection with the gateway instance. 
+
+This could be caused by the reverse SSH tunnel (autossh process) running on this instance could not connect to the Cloudera server. Please check your connection and proxy settings and make sure the instance can reach *.ccm.cdp.cloudera.com  
+
+Please check your instance on the cloud provider side if it's up and running. Restart it if it could not start up properly. 
+
+  
+
+  
+
+  
+
+/var/log/messages on master 
+
+Nov 23 08:16:22 ip-10-242-58-54 reverse-tunnel.sh: debug3: authmethod_is_enabled publickey 
+
+Nov 23 08:16:22 ip-10-242-58-54 reverse-tunnel.sh: debug1: Next authentication method: publickey 
+
+Nov 23 08:16:22 ip-10-242-58-54 reverse-tunnel.sh: debug1: Trying private key: /etc/autossh/pk.key 
+
+Nov 23 08:16:22 ip-10-242-58-54 reverse-tunnel.sh: debug1: read_passphrase: can't open /dev/tty: No such device or address 
+
+Nov 23 08:16:22 ip-10-242-58-54 reverse-tunnel.sh: debug2: no passphrase given, try next key 
+
+  
+
+cdp-doctor service status 
+
+  
+
+we can see all are in inactive status " salt-master, salt-minion,salt-api"	 
+
+  
+
+journalctl -u nginx 
+
+# /var/log/autossh-*.log 
+
+# /var/log/nginx/* 
+
+# ss -ntlp 
+
+# /etc/nginx/ 
+
+  
+
+  
+
+As of now, we are asked to install the vim-common packages manually at Master and Gateway hosts to proceed with the further investigation. 
+
+  
+
+we observed that the reverse tunnel to CCM was failing as the utility xxd was not available on the host. 
+
+  
+
+Nov 23 08:02:33 ip-10-242-58-54 reverse-tunnel.sh: +++ echo 61e8f240-7106-4191-8aa2-f0a73d6cdbb6 
+
+Nov 23 08:02:33 ip-10-242-58-54 reverse-tunnel.sh: +++ cut -c1-16 
+
+Nov 23 08:02:33 ip-10-242-58-54 reverse-tunnel.sh: /cdp/bin/reverse-tunnel.sh: line 24: *xxd*: *command not found* 
+
+  
+
+To resolve the issue, we installed the vim-common package on both the gateway host just after the instance is created in repair process. 
+
+  
+
+We removed the old /etc/autossh/pk.key file and restarted the required tunnel services. 
+
+  
+
+#rm /etc/autossh/pk.key 
+
+#systemctl restart ccm-tunnel@KNOX 
+
+#systemctl restart ccm-tunnel@GATEWAY 
+
+ 
+
+ 
+
+991810(Unable to upgrade Datahub Cluster) 
+
+ 
+
+Failed to repair cluster. Reason: Operation timed out. Could not reach bootstrap API in time. The Control Plane was not able to establish the connection with the gateway instance. This could be caused by the Jumpgate agent running on this instance not being able to connect to the Cloudera server. Please check your connection and proxy settings and make sure the instance can reach *.v2.ccm.cdp.cloudera.com Please check your instance on the cloud provider side if it is up and running. Restart it if it could not start up properly. 
+
+ 
+
+. Basically, you have upgraded the datalake and the CCM upgrade from v1 to v2 but one of the datahub, arch-dev-spark where ccm was not upgraded and that caused this issue. 3. We will have to investigate the issue related to the failed ccm upgrade on datahub as that will explain the root cause. 4. For the arch-dev-spark, currently there is no option to recover from and you will have to create the new cluster to unblock you. 
+
+ 
+
+systemctl status jumpgate-agent.service 
+
+ 
+
+cdp-doctor service status 
+
+ 
+
+Initially during CCM upgrade DH cluster was in stopped state. So CCM upgrade happened on DL nodes. As ccm was not upgraded on Datahub cluster, they retriggered the ccm upgrade to perform on Datahub cluster nodes. After CCM upgrade, they started to upgrade Datahub cluster. It failed, then they performed repair on the CM node which gave the Error in problem statement in event history.  
+
+NEXT STEPS: Abbvie: Please share the event history from the affected Datahub cluster and from the Environment summary. Also share the below log files- /var/log/messages (required) /var/log/autossh-GATEWAY.log (if present) /var/log/autossh-KNOX.log (if present) /var/log/socket_wait_cleanup.log (if present) 
+
+ 
+
+There are currently no actions needed from your end. We will update you as soon as the issue has been fixed from our end. We need to update some of the userdata scripts which manages bunch of activities while the upgrade flow. 
+
+ 
+
+We have promoted a fix patch and it will take another couple of hrs to apply the fix on impacted deployment. We are closely monitoring the progress and wil confirm you as soon as the fix applied.  
+ 
+
+We observed few issue with the spark cluster while repairing.  
+
+1. Minion issue.  
+
+Sep 23 20:18:35 arch-dev-spark-worker0 python[26528]: [ERROR ] Verification public key master_sign.pub does not exist. You need to copy it fro...irectory Sep 23 20:18:35 arch-dev-spark-worker0 python[26528]: [ERROR ] Received signed public-key from master 10.242.33.227 but signature verification failed!  
+
+We were able to resolve the issue by copying the master_sign.pub file from etc/salt/pki/minion/ on CM server to all worker nodes. This could be resolved by repairing all the nodes again too.  
+
+ 
+
+2. Hive failed to start properly. ERROR: HIVE_AUX_JARS_PATH is configured in Cloudera Manager as /opt/hive_lib. However directory /opt/hive_lib does not exist. When configured, directory specified in HIVE_AUX_JARS_PATH must be created and managed manually before starting Hive. /opt/cloudera/cm-agent/service/hive/hive.sh: line 194: ERROR:: command not found + exit 1 We observed that /opt/hive_lib was present as Aux JAR directlry in Hive configuration, but the folder did not exist. We created folder and provided permission as required Onwer - hive, permission 755 We were able to upgrade the Spark cluster to 7.2.17 without any issue. We initiated repair for the Engineering cluster but it is stuck, It will probably fail and you will need to manually repair all nodes in the cluster. Please let us know the state of the upgrade and we will help you as needed. 
+
+ 
+
+The root cause of this issue is that we initiated a design change to store userdata scripts (Userdata scripts are responsible for bootstrapping the provisioned VMs, setting up proxy, tunnel configs and orchestration tools) in Vault securely instead of storing it in our Database as plain text as it contains key materials. This change introduced a new table in our relational database that holds only reference to secrets in Vault, but due to backward compatibility we still needed to retain the old schema which is also used to migrate the userdata scripts into the new "location" if any update happening on the userdata. This migrate mechanism is wired to multiple operations in our codebase to be able to provide a seamless experience for our users. But it's just turned out with CB-23312 that the upgrade operation related logic still uses the old way to get the userdata script and the migrating mechanism saves back the old userdata scripts and basically this behaviour causes the revert of the changes what have been applied on the userdata script by the CCM upgrade and provision the newly created VMs without CCM Jumpgate enablement during upgrade. We have created a couple of emergency fixes and promoted them in prod to update the userdata scripts appropriately. The whole process to identify the rca, implement the fix, and to complete E2E test before releasing a new CB version took more than 12 hrs at our side. Now, we can assure that you will not encounter this issue again in the future. And also couple of our customers did OS and Runtime upgrades over the weekend without any issues. 
+
+ 
+
+ 
+
+871138 (issue backing up datalake) 
+
+ 
+
+moveFromLocal: s3a://arch-prod-datalake/datalakebackup_06052022/c4188f83-0369-435c-b6a0-cf99fe84cfbd_database_backup/hive_backup: delete on s3a://arch-prod-datalake/datalakebackup_06052022/c4188f83-0369-435c-b6a0-cf99fe84cfbd_database_backup/hive_backup: com.amazonaws.services.s3.model.AmazonS3Exception: Access Denied (Service: Amazon S3; Status Code: 403; Error Code: AccessDenied; Request ID: M4ZKB8NDEEZHK1VW; S3 Extended Request ID: 5EYqahYYbn/7hWeMClddrgwNB0ip23hrdiiyyc2zJMOOHCgWoZKEXIXKTPJthDBLt7rCVgWaaKM=; Proxy: null), S3 Extended Request ID: 5EYqahYYbn/7hWeMClddrgwNB0ip23hrdiiyyc2zJMOOHCgWoZKEXIXKTPJthDBLt7rCVgWaaKM=:AccessDenied. 
+
+ 
+
+We have added delete object for ranger audit admin role, after that data-lake backup process ran successfully. 
+
+936755 – os upgrade failed on dh 
+
+ 
+
+Leader Node shows unhealthy. The nodes are in instance created state. 
+
+ 
+
+The OS upgrade was able to complete the replacements of all the nodes, however the flow failed because cloudera-scm-server service in the CM node did not started. - We proceeded to retry the upgrade flow, however it was taking various minutes without seeing any change. So, decided to restart the CM service manually with the following command: 
+
+ 
+
+After a couple of minutes, we refreshed the console and could see that the rest of the nodes began to start the services. - From the CM node we checked that the CM agents in the rest of the nodes were running successfully: # source activate_salt_env # salt '*' cmd.run "systemctl status cloudera-scm-agent" - After some minutes, the CM UI was accessible and we could determine that the rest of the services were started successfully and the upgrade completed successfully now. 
+
+ 
+
+  
+
+CML issues: 
+
+ 
+
+ 
+
+1013615[PROD][CML] Applications/Jobs/Models Issue Post restore of Raiders workspace. 
+
+We are getting below error while starting Applications/Jobs/Models. "You can use only the default HadoopCli Runtime Addon specified by the site administrator. Remove the HadoopCli addon from the list of addons in order to trigger the auto selection of the default HadoopCli addon."  
+ 
+
+. We discussed that you have recently restored the CML workspace. After restore, out of about 90 applications, 30 to 40 applications started automatically and the rest were in stopped state. 2. On manually starting these applications, you received the following error: "You can use only the default HadoopCli Runtime Addon specified by the site administrator. Remove the HadoopCli addon from the list of addons in order to trigger the auto selection of the default HadoopCli addon." 3. On checking the already running applications that started automatically, you observed the Hadoop CLI addon version was "Hadoop CLI - CDP 7.2.8 - HOTFIX-1 JAVA 8U342". 4. On further checking the default Hadoop CLI version under site Admin, you saw it was set to "Hadoop CLI - CDP 7.2.16 - HOTFIX-3". 5. On changing the default Hadoop CLI version back to CDP 7.2.8 - HOTFIX-1 JAVA 8U342 (on the basis of running applications), the rest of the applications started successfully. 6. Later, the issue was seen in the already deployed models. When started, you received the same error as mentioned above. But this time, you had to revert the Hadoop CLI version back to CDP 7.2.16 - HOTFIX-3 in order for the models to work.  
+ 
+
+This is a known behaviour and we have an internal JIRA for the same - DSE-22229. We have the following workaround after you select the desired HadoopCLI addon: 1. Update the jobs 2. Update and restart the applications 3. Rebuild the models These actions will update the HadoopCLI addon set for these workloads to be the default one. 
+
+ 
+
+ 
+
+Unable to take CML workspace backup 
+
+User must have role 'crn:altus:iam:us-west-1:altus:resourceRole:MLAdmin' for this operation.&quot;}], 
+
+) As we discussed on the call, you are facing the CML control plane issue the preflight validation would be failed when the assigned resource roles are more than 20. 2) DSE-31675 will solve this issue in the next CML release. Till then customer can use skip validation option. 3) Skip validation flag will skip the following validations: a) Workspace state should be valid - "Ready" state b) MlAdmin resource role validation - which is throwing the error above. c) Backup name should be unique across active backups for a particular workspace d) Check if correct IAM permissions are present. e) Resource Group for backup snapshots should be present. (Applicable for Azure workspaces) 4) The next major release of control plane is due Jan, 2024. 5) We have skipped validation and backup is now started. 
+
+ 
+
+1001257 CML workspace performance is very slow 
+
+ 
+
+We are seeing lot of delay in command executions across the sessions in one of the CML workspaces, This is impacting or important tasks in productions. PFA Can you please setup a call so that i can show you the delay/performance impact. 
+
+ 
+
+While checking File system metrics for that workspace's Amazon Elastic File System (Amazon EFS), we found Throughput utilization reached around 100% - You already encountered similar situation in other CML workspaces' Amazon EFS and AWS team suggested to change the throughput mode from Bursting to Elastic 
+
+Amazon Elastic File System (EFS) provides two throughput modes: Bursting Throughput and Provisioned Throughput. These modes determine how the file system scales its throughput in response to the amount of data being stored and the I/O patterns of the applications using the file system. 
+
+Bursting Throughput: 
+
+Description: Bursting Throughput is the default throughput mode for EFS. It is designed for workloads with varying I/O patterns where throughput needs may spike but average out over time. 
+
+How it Works: In this mode, your file system accumulates I/O credits during periods of low or no activity. When the file system needs to serve requests beyond its baseline throughput, it uses these credits to burst and meet the increased demand. 
+
+Credits and Limitations: The file system accumulates credits at a rate that is based on the file system size. The bursting throughput has a baseline rate and a burst rate. The file system can burst up to a maximum throughput for short periods when it has accumulated sufficient credits. 
+
+ 
+
+Elastic Throughput mode 
+
+For file systems that are using Elastic Throughput, Amazon EFS automatically scales throughput performance up or down to meet the needs of your workload activity. Elastic Throughput is the best throughput mode for spiky or unpredictable workloads with performance requirements that are difficult to forecast, or for applications that drive throughput at 5% or less of the peak throughput on average (the average-to-peak ratio). 
+
+ 
+
+Provisioned Throughput: 
+
+Description: Provisioned Throughput is suitable for applications with predictable and consistent workloads where you want to guarantee a specific level of throughput. 
+
+How it Works: In this mode, you can provision a specific throughput level for your file system. The throughput you provision is the guaranteed minimum for the file system, and it can burst beyond this level if credits are available. 
+
+Guaranteed Minimum: Provisioned Throughput ensures a minimum level of throughput, and bursting is possible if the file system has accumulated sufficient credits. 
+
+ 
+
+#948705[Prod]:Unable to increase autoscale range in CML workspace 
+
+We checked the CloudFormation > EC2 > Auto Scaling > Auto Scaling Group Auto scaling group: liftie-zm5hzzqv-mlcpu-c4c5-NodeGroup Failed: Could not launch On-Demand Instances. 
+
+ 
+
+ VcpuLimitExceeded .... 
+
+ 
+
+[PROD] CML workspace status displayed as "installation failed" 
+
+ 
+
+Hi Team, We are trying to backup a CML workspace . After the backup is done workspace status is being shown as "installation failed" in CML UI. when we checked from the event logs it is showing backup as successful .but it failed while scaling up infra nodes . below is the error we see in event logs 2022-10-22T05:35:17.870Z Backup SUCCEEDED 2022-10-22T05:35:21.374Z Starting scaling up CML infra pods 2022-10-22T06:05:29.226Z FATAL: Scaling up CML infra pods FAILED. Manual Intervention Required. Error : timed out waiting for the condition 2022-10-22T06:05:29.231Z FATAL: need to manually add installation:failed status for workspace after succesful intervention 
+
+ 
+
+We notice OOM killed in describe pod ooutput of autoscaler pod 
+
+ 
+
+understood that the back up completed > increased the resource limit of cluster-autoscaler pod 1000Mi > the autoscaler pod and other pods came up without issues > verified that the workspace is up and running my manually hitting the URL > but the management console is still showing that back up operation timeout 
+
+SRE team to apply the changes on the control plan  
+ 
+
+[Prod] Changing instance type in CML workspace 
+
+ 
+
+Changing instance type is getting failed with below error: "Failed to delete cluster instance group: Received status Runtime Status: stack 'liftie-sg71dhmz-mlcpu0-eks-worker-nodes' status is 'DELETE_FAILED' , expected status in {RUNNING, SUCCEEDED, ACTIVE} ." We got the new instance type but the old instance type didn't got delete. 
+
+ 
+
+We have confirmed the Delete of the Older InstanceType has failed owing to [1] i.e. ErrorCode 409. This Error 409 happens completely at AWS Side & AWS Support have always suggested retrying the Operation always without any RCA. We are checking on how to retry the DELETE Operation (Which has happened already) to ensure the DELETE completes without any activities successfully. We shall keep your Team posted on the Case. Regards, Smarak [1] "log": "Service: Liftie, Message: Failure event: {liftie-sg71dhmz-mlcpu0-eks-worker-nodes 2023-02-25 12:50:24.247 +0000 UTC liftie-sg71dhmz-mlcpu0-eks-worker-nodes DELETE_FAILED The following resource(s) failed to delete: [NodeInstanceRole]. }" }, { "createdDate": "2023-02-25T13:45:34.271Z", "log": "Service: Liftie, Message: Failure event: {liftie-sg71dhmz-mlcpu0-eks-worker-nodes 2023-02-25 12:50:23.541 +0000 UTC NodeInstanceRole DELETE_FAILED Cannot delete entity, must detach all policies first. (Service: AmazonIdentityManagement; Status Code: 409; Error Code: DeleteConflict; Request ID: db370968-069f-4609-83d8-4a6e955b7c72; Proxy: null)}" 
+
+manually 
+
+cdp ml delete-instance-group --workspace-crn --instance-group-name mlcpu0 
+
+ 
+
+CML workspace upgrade failed due to lambda function deleting volumes 
+
+Limit on number of sessions/pods that can be created by a user 
+
+ 
+
+ 
+
+ 
+
+Cde 
+
+ 
+
+994311 [PROD][CDE]Facing no healthy upstream error 
+
+ 
+
+We observed that when we are submitting jobs from our application, we are facing below error for some of the jobs: [Thread-792] DEBUG com.modak.bots.SparkScriptBot - Error: run job failed: run failed to start: failed to submit batch: Livy batch not created: HTTP 503, body: no healthy upstream 
+
+ 
+
+Check livy container is running 
+
+Restart of livy will work and even retriggering those failed jobs also work but we don't want to restart them manually everytime we face this issue.  
+ 
+
+[PROD] CDE cli jobs taking longer to submit. 
+
+  
+
+957076 
+
+ 
+
+We are facing an issue with CDE where the jobs submitted through sppark-submit cli. Are taking more than a minute to get the job ids. According to our scripts we will be waiting for 60 seconds to get the job details and if not the scripts consider it as a failed submit. This is causing a major delay for us! 
+
+ 
+
+Customer runs "cde spark submit" that usually returns within job run ID within 20-30sec. This run ID gets used in external tool called (Modak Nabu) to track the jobs and display to end users. - They started noticing the CLI taking 2-3min to return the actual run ID today. This is more than the usual 60 sec timeout they have in their code. This impacts their production jobs setup. - They also tried to call the "cde job run list" and that just returned 404 or Nulls. So it seems the API server was responding while the Livy pod was having issues processing the job request. - They restarted the Livy pod for one virtual cluster one hour back. That helped reduced the time to ~30sec. 
+
+we want to know what the EFS credits & metrics look like. 
+
+We have some suspicion that this could be slowing things down. If you can take some screenshots of the utilization over the past 24 hours that would help. 
+
+From the provided details, throughput is 100% which is not normal. 
+
+ 
+
+We had a call with AWS regarding the spike in throughput what they suggested us is to change the throughput. As of now the throughput which we are using is burst can we change it to elastic throughput and try? 
+
+ 
+
+ 
+
+Workaround : 1] Restart CDE VC API Server pod : kubectl get pods -n | grep api  
+
+Here, please use actual VCNamespace select API Server pod and restart  
+
+2] Kill all pods stuck in NotReady Status : kubectl get pods -A | grep | grep NotReady | awk '{print $2 " --namespace=" $1}' | xargs kubectl delete pod 
+
+ 
+
+ 
+
+924638 - PROD] CDE job in starting state 
+
+ 
+
+We have opened an improvement JIRA for this issue with the engineering team. - When there is a failure at the scheduling from the Yunikorn service, the job should have been moved to failed / other state. - But even though the pod was failed to run, still the job was stuck in starting state. With this improvement JIRA, we are requesting the Engineering to change the behaviour of CDE to make sure to reflect the correct status of the job. Reference: Jobs getting stuck in STARTING state when driver pod scheduling failed. https://jira.cloudera.com/browse/DEX-8690 
+
+ 
+
+ 
+
+918019 - [PROD][CDE] All the CDE jobs getting failed 
+
+We believe Customer is hitting some form of TSB [2] owing to the CDE Pods running > 90 Days Uptime. The TSB requires Calico & Livy Pod to be restarted, with Customer restarting Livy Pods & we would recommend your Team to restart Calico Pod to address [2] successfully as CDE v1.16 is affected by the TSB. The TSB affects all CDE Job. 
+
+ 
+
+895956  
+
+ [PROD] CDE jobs are consuming a lot of time to finish 
+
+ 
+
+CDE jobs are consuming a lot of time to complete. Even the smaller jobs are consuming a lot of time which is unusual and unexpected. This is being noticed in both DEV and PROD environments. Internal findings: 1. Most of the jobs are completing in 16.3-16.4minutes (which is unusual for all jobs). 
+
+ 
+
+Also you would like to know if setting the "cde.gangScheduling.enabled"="false", resolves the issue or is it just a testing workaround? The following are the suggestions mentioned by our Engineering team Because it's the performance issue now, we have passed the pause problems, and the log shows gang scheduler, You should try to disable it or enable it then compares the performance. And the cde.gangScheduling.enabled is true now, we can try to set false. 
+
+ 
+
+A] How to disable Gang Scheduling feature in yunikorn CDE? Stop the scheduler by: kubectl scale deployment yunikorn-scheduler -n yunikorn --replicas=0 kubectl edit deployment yunikorn-scheduler -n yunikorn Add env var: "DISABLE_GANG_SCHEDULING: true" to the container "yunikorn-scheduler-k8s" Make sure the flag is correctly set, we can see that from the first line of the log that prints the scheduler configuration Start the scheduler by: kubectl scale deployment yunikorn-scheduler -n yunikorn --replicas=1 B] How to restart yunikorn scheduler in CDE cluster? $ kubectl get pods -A $ kubectl scale deployment yunikorn-scheduler -n yunikorn --replicas=0 Wait for ~5 Minutes, then run $ kubectl scale deployment yunikorn-scheduler -n yunikorn --replicas=1 Wait for ~5 Minutes, then run $ kubectl get pods –A 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Solr: 
+
+922345  
+
+Any recommendation to free up space on Solr 
+
+ 
+
+We observed the Solr index directory is mostly used by ranger_audits collection index data. We have the following options,  
+
+1) to delete old audit logs on ranger_audits collection, for example, delete the old audit logs aged larger than 14d curl -v --negotiate -u : "http://$(hostname -f):/solr/ranger_audits/update?commit=true" -H "Content-Type: text/xml" --data-binary "evtTime:[* TO NOW-14DAYS]" We checked the oldest logs, by running curl command # curl -k --negotiate -u : "http://$(hostname -f):/solr/ranger_audits/select?q=*%3A*&rows=1&sort=evtTime%20asc" the result showed that the oldest record time is Oct 22. On the call you would like to retain the data as you want the audit logs can be queryable in 2 months.  
+
+2) another option, is to add a new Solr instance on a node other than core2. Move the replicas on core2 to the new solr instance. 
+
+ 
+
+834152  
+
+[Dev] Solr Shards down in Dev datalake 
+
+Shard2 of Ranger Audits Collection (With 2 Replicas) is Down on "Core0" & "Core1" on CDP v7.2.11 Cluster. From Core0 Logs, We observe the Core attempted Leadership yet Closed the Sync Process as Core1 Version were Higher [1] with Core1 anticipating the same as well [2]. To fix the concerned Issue, We may follow the below approaches:  
+
+(I) Use ForceLeader [3]. With Solr-KeyTab, Run the Command. Wait for the Command API Output & Share the Outcome of the Command along with Solr ClusterStatus: ### curl -k --negotiate -u : "http[s]://:/solr/admin/collections?action=FORCELEADER&collection=ranger_audits&shard=shard2"  
+
+(II) If Force Leader doesn't work, Shutdown Solr Service on Core0 Host to ensure Core1 Shard2 of Ranger Audits Collection is elected Leader after ~180 Seconds of Core0 Solr Service being Shutdown. Once Core1 Shard2 of Ranger Audits Collection is Active & Leader, Start Core0 Solr Service,  
+
+(III) If the 2nd Option doesn't work, Stop Solr Service on Core0 & Restart the Solr Service on Core1. Wait for Core1 Shard2 of Ranger Audits Collection is elected Leader after ~180 Seconds of LeaderElection Timeout. Once Core1 Shard2 of Ranger Audits Collection is Active & Leader, Start Core0 Solr Service. 
+
+ 
+
+Such manual intervention are required for LeaderElection Conflict, wherein each involved Replicas are unable to transition to Leader Role owing to Leader-Intended Replica (With Lowest Sequence Number) skipping Leader Role as other Replica is having higher versioning 
+
+ 
+
+830780  
+
+[DEV] Error while indexing solr using cde 
+
+ 
+
+we have changed the keytab as per Shaun's suggestion and solr indexing using raw scala code is now working fine. previous jaas.conf: Client { com.sun.security.auth.module.Krb5LoginModule required useKeyTab=true keyTab="nabu-spark-bots.keytab" useTicketCache=false doNotPrompt=true debug=true principal="svc-arch-dev-spark@ARCH-DEV.L6RN-ZJ16.CLOUDERA.SITE"; }; changed jaas.conf: Client { com.sun.security.auth.module.Krb5LoginModule required useKeyTab=true keyTab="/app/mount/nabu-spark-bots.keytab" useTicketCache=false doNotPrompt=true debug=true principal="svc-arch-dev-spark@ARCH-DEV.L6RN-ZJ16.CLOUDERA.SITE"; }; 
+
+ 
+
+807416  
+
+[Prod]Multiple Solr nodes Dead while indexing the data 
+
+1. Rename your current solr-core-[VERSION].jar file as a backup. Please note your solr-core jar file in the /opt/cloudera/parcels/CDH/jars/ directory will have a version number rather than "[VERSION]". Your actual version number should be substituted for "[VERSION]" throughout the instructions below. mv /opt/cloudera/parcels/CDH/jars/solr-core-[VERSION].jar /opt/cloudera/parcels/CDH/jars/solr-core-[VERSION].jar.bck 2. Copy the hotfix jar to the host and move it to the /opt/cloudera/parcels/CDH/jars/ directory. 3. Rename the new jar file to match the existing solr-core jar file's original name: mv /opt/cloudera/parcels/CDH/jars/solr-core-8.4.1.7.2.7.0-ENGESC-10429.jar /opt/cloudera/parcels/CDH/jars/solr-core-[VERSION].jar 4. Set the ownership of the new jar file to cloudera-scm:cloudera-scm. 5. Set the permissions mode on the new jar file to 755. 6. After the steps above are executed on every host running an Oozie role in the cluster, restart the Oozie service. 
+
+ 
+
+ 
+
+These type of errors 2021-11-17 10:40:56.106 ERROR (qtp1020154737-940126) [c:timeline s:shard4 r:core_node17 x:timeline_shard4_replica_n14] o.a.s.s.HttpSolrCall null:java.lang.RuntimeException: java.lang.OutOfMemoryError: unable to create new native thread can be caused by low process/user/os limits. To check if this is the root cause of the issue: 
+
+On all Solr nodes execute these command that will raise the OS limits until the next reboot. No need to reboot server or restart Solr service: sysctl -w kernel.threads-max=2061130 sysctl -w kernel.pid_max=2061130 sysctl -w vm.max_map_count=262144 
+
+Do you see similar issue about OOM threads after implementing the Kernel level changes ? 
+
+No 
+
+I'm attaching 2 jar files containing the fix. Server side fix : solr-core-8.4.1.7.2.7-case_795703.jar Client side fix : solr-solrj-8.4.1.7.2.7-case_795703.jar The Server Side Fix JAR ( solr-core-8.4.1.7.2.7-case_795703.jar ) needs to be deployed on ALL Solr Nodes. The Client Side Fix JAR ( solr-solrj-8.4.1.7.2.7-case_795703.jar ) needs to be deployed on ALL Solr Node, Every service which has ranger enabled since the ranger plugins uses solr client, Every node where indexer jobs run.  
+The JAR provided to you in case 807416 contained the server-side fix. Upon running more intensive tests, we found that this issue cannot be fixed by only server side changes it requires client code modification as well. That is why we developed 2 JARs, one with Server-side fix, and the second with Client-side fix. 
+
+ 
+
+ 
+
+ 
+
+HIVE 
+
+ 
+
+1010939- Slow performance in CDW Hive when running a particular query 
+
+We noticed that there was a slowness for a particular query when we are running in CDW hive and we run the same query in datahub hive it took only 30sec to complete.  
+
+ 
+
+In case of Tez execution engine(Datahub), the query submits more number of Reducers tasks compared to what we see with LLAP in CDW. With Tez:= Total Tasks = 1975 WithLLAP := Total tasks = 260 I want to try out one property, and see if this helps with the performance : set hive.mapred.reduce.tasks.speculative.execution=true; 
+
+ 
+
+hiveserver2 > Configuration FIles: hive-site Add a new property(by clicking on a + sign) Name: hive.mapred.reduce.tasks.speculative.execution Value: true  
+
+Query Coordinator > Configuration FIles: hive-site Add a new property Name: hive.mapred.reduce.tasks.speculative.execution Value: true 
+
+ Query Executor > Configuration FIles: hive-site for standalone compute Add a new property Name: hive.mapred.reduce.tasks.speculative.execution Value: true Restart the VW. 
+
+ 
+
+ 
+
+ 
+
+ 
+
+965815 
+
+[PROD] Queries are not running in DWX hive 
+
+Description 
+
+Hi Team, As we ran the queries from hive dwx its taking too much time to fetch the results. its stuck at Tez session hasn't been created yet. Opening session 
+
+ 
+
+This type of issues can occur when the Autoscaler has failed to Scale up due to unhealthy Pods on the Cluster. Where we could see that One of the Pod named usage-monitor went in failed state and was unable to reach to the respective API, resulting in queries failure due to non availability of the executors. This has been resolved by simply re-creating the mentioned Pod where there could be some transient issue when the issue started. 
+
+As mentioned earlier on the case notes as well as on the Zoom session, this could be transient networking issue where Usage-Monitor Pod get failed due to unable to connect with https://dbusapi.us-west-1.sigma.altus.cloudera.com/ resulting in Autoscaling failures too. 
+
+ 
+
+restart of usage-monitor pod did not fix the issue, we had to restart all the co-ordinator and executor pods to fix the issue. This is the second time we are facing this issue in 2 weeks. we need a permanent fix for this issue. 
+
+ 
+
+ooking through the Logs, we could see that the Coordinator Pods were getting killed because of Memory issue 
+
+ 
+
+Adding to my previous update, specifically you may need to consider increasing the Coordinator Pod memory to 8GB from 4Gb 
+
+ 
+
+Either of the one could be causing the issue. >> Either a specific bad query could be causing the OOM's or >> Lot of queries running in parallel could be causing it. >> We can check the Graffana charts to understand how many queries are running in parallel at a time. 
+
+ 
+
+ 
+
+Engineering team has the following observations: -> We have autoscaling enabled with min Executor=4 and max=20 Remarks: Please be informed that coordinators are co-located with executors, so having 4 executors means having 4 coordinators as well, which means 4 concurrent queries. It can easily happen that we want to run more than 4 queries, and autoscaling takes time, so, queries spend a lot of time waiting for a co-ordinator. Why don't we consider setting min executor=10, and max=20, so we can have more co-ordinators at our disposal, and we can also avoid autoscaler issues to some extent. 
+
+ 
+
+961964  
+
+Unable to create Hive Virtual WareHouse 
+
+ 
+
+timeout exceeded transitioning from state 'Starting'.Last event: {InProgress checking if hiveserver2 statefulset is ready with at least 1 ready replica(s) (config-id: 89a3fe16-55c7-4f21-90cd-dd8ea78eb044 version: 2023.0.14.0-155) 2023-05-25 02:46:54.510357616 +0000 UTC [] map[]}. Error Code : 9999 
+
+ 
+
+We have seen that the PVC was failing to be created because of missing permission in its associated policy for NodeInstanceRole. After adding below part to efs inline policy for NodeInstanceRole associated with CDW environment, the PVC was created and also the VW usage monitor pods. ---------------- { "Effect": "Allow", "Action": [ "elasticfilesystem:TagResource" ], "Resource": "*", "Condition": { "StringLike": { "aws:ResourceTag/efs.csi.aws.com/cluster": "true" } } }, ---------------- We have seen this issue appearing recently, there has been no change in-terms of how we create the EFS from CDW standpoint, but there appears to be some change at AWS side which is contributing to this issue.  
+
+ 
+
+ 
+
+960995  Vertex failures in HIVE 
+
+ 
+
+he specific job is trying to spill to local disk(Executor Pods) with heavy data size causing the issue. You would be able to validate this by checking space utilisation in pods while running the query. The hive spill disk is the ephemeral storage under the executors. This disk has a fixed size based on the instance type in both AWS and Azure. However for larger queries, we might want to have a larger disk for the executor. There is an enhancement tracked via https://jira.cloudera.com/browse/DWX-13443 to support additional disk(ephemeral) or spill to S3 itself instead of storing in the local disk of executor pods We are able to execute the query on Impala VW has this enhancement already. Impala executors support larger disk and S3 backed spill areas.  
+ 
+
+ 
+
+954915  
+
+Issue while creating database in hive through CDE using Scala code 
+
+ 
+
+From case description, logs provided, and parent case 913335 history, I understand CDE job in CDP-7.2.16 prod cluster is complaining with HMS timeouts during the creation of citeline DB. Checking the CDE log of 82733 job [1] and HMS log [2] for this issue, I can correlate the messages, if this has been resolved by restarting HMS, the root cause must be focused in HMS. From Spark side, there is no configuration change to mitigate this timeout. 
+
+ 
+
+904405  
+
+AutoSuspend not working as expected for CDW Hive 
+
+ 
+
+Based on [1] information in the usage monitor pod logs, I have found DWX-12923 jira for this issue and it solved in the 1.4.2-b118 (released August 4, 2022) 2022.0.9.0-120 version. Next Actions:- ========== > The current Hive VW version is 1.4.1-b86 (released June, 22, 2022) 2022.0.8.0-89 so please upgrade the VW to above version. 
+
+ 
+
+ 
+
+891330 
+
+Unable to see other user queries in Hue - Hive VW 
+ 
+
+ 
+
+please try to restart the hue-qp pod again and share the describe pod output for our reference 
+
+ 
+
+And, current user is able to see own executed queries > I am checking internally for the other user queries viewing in Hue 
+
+ 
+
+Impala: 
+
+ 
+
+1009058  
+
+ 
+
+DWX-Impala - Queries failing with "Cancelled in TmpFileBufferPool" error. 
+
+ 
+
+ 
+
+User is trying to run a create table as select query in an impala DWX cluster but getting the same error all the time. We tried running the same query in both small sized and large sized clusters but still getting the same error. We need assistance in increasing the memory limits for such memory centric queries. 
+
+ 
+
+From the shared details we understand that User is trying to run a create table as select query in an impala DWX cluster but getting below error: === Memory limit exceeded: Failed to allocate row batch EXCHANGE_NODE (id=7) could not allocate 8.00 KB without exceeding limit === Please correct me if my understanding of the reported behaviour is not precise. 
+
+ While looking into the attached profile, i see some of the involved tables are having missing stats which may lead to unoptimised query plan resulting such memory crunch: === WARNING: The following tables are missing relevant table and/or column statistics. rwd_p_omop_optum_marketclarity_cdm2.concept === Hence, can you run "compute stats <tablename>" on above mentioned table and validate if the issue persists? Also on both of the error files, i see queries getting failed with above mentioned error, so may i know where you have seen "Cancelled in TmpFileBufferPool" error? 
+
+ 
+
+Can you run "compute stats <tablename>" on above mentioned table and validate if the issue persists? --We've run the compute stats on the mentioned table as of now. --We'll check with the user on re-running the query and get back to you soon. Also on both of the error files, i see queries getting failed with above mentioned error, so may i know where you have seen "Cancelled in TmpFileBufferPool" error? --We've seen the error in Impala HUE UI and we have earlier attached the same screenshot to the case as well. 
+
+ 
+
+3. Is the query running successfully while setting MEM_LIMIT to higher value than query planner currently assigning[1]? For ex: set MEM_LIMIT=25GB; Looking forward to hear back from you. Regards, Krish [1]Per-Host Resource Estimates: Memory=21.16GB 
+
+ 
+
+You can try setting up in the session level before running the query like: > set MEM_LIMIT=25GB; > CTAS query  
+ 
+
+ 
+
+987869  
+
+Impala query keeps running without producing any result. 
+
+ 
+
+ 
+
+1.The query executes successfully in Hive. 
+
+ 2.Initially, the query encountered disk I/O errors with the LIMIT clause;  
+
+without it, the query runs indefinitely. 3.After deleting the catalog pod, the query runs smoothly without the LIMIT clause. However, when the LIMIT clause is reintroduced, the query continues to run indefinitely. 
+
+ 
+
+After setting up MT_DOP=0 we were able to run the query successfully. 
+
+ 
+
+The value of MT_DOP determines the threading model Impala uses for intra-query parallelism. 
+
+ You can refer below doc for more details: https://impala.apache.org/docs/build/html/topics/impala_mt_dop.html > I checked with Engineering its actually a below known BUG, It is addressed in future releases. https://issues.apache.org/jira/browse/IMPALA-12233 
+
+ 
+
+985846 - [PROD-DWX] Analysis Exception issue in Impala tables/views 
+
+AnalysisException: org.apache.impala.catalog.TableLoadingException: Could not load table dependency_4_0.v_pcsdw_med from catalog CAUSED BY: TableLoadingException: Could not load table 
+
+I have one finding here on the attached view DDL and this is causing the issue. There are many Impala Reserved Words used in the provided DDL. Below are the few i have found: as cast case concat distinct While using these Reserved Words we need to use the backticks like below: CREATE TABLE `select` (x INT): Otherwise it fails with the given error. 
+
+ 
+
+We are not able to run the query in sparksql if we use backticks. 
+
+ 
+
+As per the below doc these backticks are supported for identifiers only as column names or database names from spark side. https://spark.apache.org/docs/latest/sql-ref-identifier.html#description But they have suggested try with "spark.sql.ansi.enabled" property, This property introduced in Spark 3.0.0 In the pyspark command can you set this property and then give a try? pyspark3 --conf spark.sql.ansi.enabled=true If this does not work i think there is no other options and we should use impala to create the views. 
+
+ 
+
+914361- [PROD] HUE UI is not opening for Impala DWX  
+
+ 
+
+HUE-UI for Impala DWX was not opening. Later, on restarting thehue-frontend pods, it's working fine and UI was opening.	 
+
+This is known issue and we have provided multiple times RCA on this on different cases. eg : 822058 Please refer above case and RCA is The main reason is the hue backend was killed. And Once it comes up, huelb has to be restarted to access the Hue, As we have restarted the huefrontend pod which has huelb deployment, and after that, the Hue UI was accessible 
+
+ 
+
+ 
+
+ 
+
+903971: 
+
+Unable to connect to non default impala virtual warehouse from CML 
+
+ 
+
+It was about syncing data connections in project with workspace, it will be there in project settings. But we are still waiting for user to confirm. 
+
+ 
+
+ 
+
+Unable to generate diag bundle due to missing tags from aws s3 bucket. Which added explicit deny for bucket 
+
+ 
+
+ 
+
+ 
+
+One of hive co-ordinators were going into crashloopback state , even after scaling down and up of sts it was still same. 
+
+We noticed that node which was launching on only node was crashinh 
+
+We cordon and drained that node 
+
+ 
+
+ 
+
+ 
+
+Create credential to create a cross acount tole in aws 
+
+Activate environment 
+
+Upload cloud formation stack.create ssh keypair,  
+
+Fill additional details required to create an env 
+
+ 
+
+ 
+Recurring FreeIPA "unreachable" status 
+
+ 
+
+ 
+
+FreeIPA is reported as having one or more instances in "Unreachable" status. The issue seems to be intermittent, recurring frequently. 
+
+ 
+
+Restart the IPA agent.  
+
+#systemctl restart cdp-freeipa-healthagent.service  
+
+From the logs it seems like the agent is not responding for some reason, but I can't see anything helpful in the logs. After restart please wait 10 minutes and collect the following logs: #The IPA status. #systemctl status cdp-freeipa-healthagent.service #/cdp/ipahealthagent/ipahealthagent.log #/var/log/nginx/* 
+
+ 
+
+ 
+
+891257: 
+
+While trying to create CML workspace (i.e, while selecting environment), we are getting an issue with FreeIPA. We noticed that one of the FreeIPA servers is unhealthy/unreachable state. PFA of the same in case. FYI: We've checked from AWS end and found that particular FreeIPA server is healthy and running; status checks are also fine. We are able to SSH as well to that server from CLI. 
+
+ 
+
+Please check the IPA status on the unhealthy node ipactl status Make sure the Cluster Connectivity related services are RUNNING in the IPA nodes. sudo -i source activate_salt_env salt '*' cmd.run 'cdp-telemetry doctor ccm status' 2>/dev/null salt '*' cmd.run 'cdp-doctor network status' 2>/dev/null Please check systemctl status jumpgate-agent.service 
+
+ 
+
+ 
+
+As discussed , cluster is in Medium duty DH so there is no as such impact because out of 3 ,IPA only one is unreachable . we have restarted Ipa server from AWS console and it didnt change any IP.Post that all back to running state and you can start to create CML workspace. 
+
+ 
+
+found there is autossh and connectivity issue and that identify the instance that is unhealthy.This disconnection mostly happen between Control plane and Cloud provider because of health check which is received and thats turn out broken somewhere and restart particular IPA able to help us solve issue without any issues. 
+
+ 
+
+885828(CDW resource pools and resource monitoring based on users) 
+
+  
+
+As of now there is no option to create different resource pools in CDW compute just similar to Yarn queue. It is a new feature request. 
+
+  
+
+With regards to resource monitoring, DWX does not support monitor CDW resource usage by users. However you can integrate with WXM. 
+
+If the queries executed from your CDW VW are not showing up in WXM, then please capture VW diag bundle. It will have databus producer pod logs which is responsible for forwarding the metrics to WXM. 
+
+1)In workload manager, how can we differentiate queries that are directed to different virtual clusters? 
+
+i.e if I have multiple clusters by name x and y, can i know what queries are executed from x and what queries are executed from y virtual clusters. - no such option 
+
+896151 
+
+i) For Datahub based Spark job: 
+
+============================== 
+
+Under WXM UI>Spark Jobs>Click on the required spark job>Under Execution details>Click on Configurations>Spark Properties>search for "spark.driver.host”>It will provide the hostname of the spark driver. Hostname contains the Datahub cluster name in it. 
+
+  
+
+Example: Value of spark.driver.host 
+
+mycluster-worker1.test-8940.a465-9q4k.cloudera.site 
+
+  
+
+So the Datahub name here is: mycluster 
+
+  
+
+  
+
+ii) For CDE based Spark job: 
+
+============================== 
+
+Under WXM UI>Spark Jobs>Click on the required spark job>Under Execution details>Click on Configurations>Spark Properties>search for the attribute "spark.com.cloudera.cde.security.authentication.server.JWTRedirectAuthenticationFilter.param.authentication.provider.url" 
+
+  
+
+It provides the DEX Environment ID. 
+
+  
+
+Example: 
+
+  
+
+spark.com.cloudera.cde.security.authentication.server.JWTRedirectAuthenticationFilter.param.authentication.provider.url -> https://service.cde-2zp9tqws.test-8940.a465-9q4k.cloudera.site/gateway/knoxsso/api/v1/websso 
+
+  
+
+Here 2zp9tqws is the DEX Enviromment ID. 
+
+  
+
+Also: 
+
+Under WXM UI>Spark Jobs>Click on the required spark job>Under Execution details>Click on Configurations>Spark Properties>search for “spark.kubernetes.namespace” 
+
+  
+
+It provides the DEX cluster ID(CDE Virtual Cluster). 
+
+  
+
+Yes - for Hive query, you can use the following approach to differentiate: 
+
+  
+
+For Datahub query: 
+
+Under WXM UI>Hive Queries>Execution details tab>Under Query details>Configurations>Search the configs: hive.server2.thrift.bind.host 
+
+  
+
+It will show the FQDN of the Datahub host in which query is executed. From the hostname, you can find the Datahub cluster name. 
+
+  
+
+For CDW query: 
+
+Under WXM UI>Hive Queries>Execution details tab>Under Query details>Configurations>Search the configs: hive.scheduled.queries.namespace 
+
+  
+
+It will show the VW ID name. With that, you can identify the Virtual Warehouse name from which the query was submitted. 
+
+  
+
+Impala Queries appearing in WXM are not exposing such attributes to filter. So we can't use any attribute to differentiate as we do for Hive queries. 
+
+  
+
+One thing what you can do is: Download the query profile and look for the "Coordinator" attribute in the file. In case of a query from Datahub, we can see the coordinator hostname using which we can identify the Datahub cluster name. 
+
+  
+
+Example: 
+
+Coordinator: dh-mycluster-coordinator0.geo-8859.a465-9q4k.cloudera.site:27000 
+
+  
+
+However the query profile for CDW Impala VW will have the generic value "Coordinator: coordinator-0", so we can't identify the VW name. 
+
+  
+
+694256 
+
+https://my.cloudera.com/cases/991810/comments 
+
+https://my.cloudera.com/cases/953276/comments 
