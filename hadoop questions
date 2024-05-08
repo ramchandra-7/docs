@@ -1,0 +1,305 @@
+1. What are the different Hadoop configuration files?
+
+Ans:
+
+1. Hadoop-env.sh
+
+2. Core-site.xml
+
+3. Hdfs-site.xml
+
+4. Mapred-site.xml
+
+2. What are the three modes in which Hadoop can run?
+
+Ans:
+
+1. Standalone Mode
+
+2. Pseudo distributed Mode
+
+3. Fully distributed Mode
+
+3. What are the differences between regular FileSystem and HDFS?
+
+Ans:
+
+The main difference between the regular file system and the HDFS is block size.
+
+In case of regular file system the block size is 4kb, but for HDFS it’s 64MB or 128 Mb
+
+The other difference is data retrieval.
+
+Data can be fastly retrieved from HDFS than regular FS.
+
+4. Explain the architecture of HDFS.
+
+Ans:
+
+HDFS is mainly designed for working on clusters of commodity Hardware devices.
+
+It is a master/slave architecture.
+
+It contains two nodes.
+
+1. Name node: Which is a master node. It has a responsibility to monitor the data and giving instructions to data nodes.
+
+2. Data Node: Which is a slave node. These are work horses of HDFS. They obey the instruction given by Name Node.
+
+5. If you have an input file of 350 MB, how many input splits would HDFS create and what would be the size of each input split?
+
+Ans: Three input splits if block size is 128 MB. They are 128MB,128MB and 94 MB
+
+6. Which command will help you find the status of blocks and FileSystem health?
+
+Ans: hdfs fsck
+
+7. What would happen if you store too many small files in a cluster on HDFS?
+
+Ans: If we store too many small if causes the Name Node to run out of metadata space in memory. The data nodes also report block changes to the Name Node.
+
+8. What is speculative execution in Hadoop?
+
+Ans: In Hadoop, Speculative Execution is a process that takes place during the slower execution of a task at a node. In this process, the master node starts executing another instance of that same task on the other node. And the task which is finished first is accepted and the execution of other is stopped by killing that.
+
+9. What are the different schedulers available in YARN?
+
+Ans:
+
+There are three types of schedulers available in YARN
+
+1.FIFO
+
+2.Capacity
+
+3.Fair.
+
+10.What is the difference between an external table and a managed table in Hive?
+
+Ans:
+
+The difference between a managed and external table is when you drop an external table drops just metadata from Meta store without touching actual file on HDFS.With a managed table, it drops metadata from Hive Meta store and files from HDFS.
+
+11.What are the key components of HBase?
+
+Ans: HBase has 3 components
+
+1.HMaster
+
+2.Region Server
+
+3.Zookeeper.
+
+12.Mention Hadoop core components?
+
+Ans:
+
+HDFS,YARN,MapReduce,PIG,Hbase,Hive,Spark
+
+13.Explain the major difference between HDFS block and InputSplit.
+
+Ans:
+
+HDFS block is the physical part of the disk which has the minimum amount of data that can be read/write. While input split is the logical chunk of data created by the input specified in the MapReduce job.
+
+14.What is checkpointing in hadoop?
+
+Ans:
+
+Checkpointing is adding fsimage and edit log to create into a new fsimage.
+
+15.Mention different Features of HDFS and explain them.
+
+Ans:
+
+1.Scalability:It stores data on multiple nodes in the cluster, when requirements increase we can scale the cluster.
+
+2.High Availability: It is availability of data even during Name Node or Data Node failure.
+
+3.Replication: Data Replication is one of the most important and unique features of HDFS. In HDFS replication of data is done to solve the problem of data loss in unfavorable conditions like crashing of a node, hardware failure, and so on.
+
+4.Fault Tolerance: HDFS is highly fault-tolerant and reliable. HDFS creates replicas of file blocks depending on the replication factor and stores them on different machines.
+
+5.cost-effective: It stores the actual data oncommodity hardware, thus reduces storage costs.
+
+16.What is DistCp?
+
+Ans: DistCp (distributed copy) can be used to copy data between Hadoop clusters DistCp uses MapReduce to implement its distribution, error handling, and reporting. It expands a list of files and directories into map tasks, each of which copies a partition of the files specified in the source list.
+
+17.What is a partition in Hive?
+
+Ans:
+
+Partitioning in Hive means dividing the table into some parts based on the values of a particular column like date, course, city or country.
+
+18.What is the minimum number of ZooKeeper services required in Hadoop2.0
+
+Ans:
+
+3 Zoo Keepers.
+
+19.Explain the difference between blacklist node and dead node.
+
+Ans:
+
+Blacklist node, have failed too many times in job execution. Dead Node, which are not in cluster or configure but not showing into the cluster
+
+20.What will happen if one DN is down for 1 hour?
+
+Ans:
+
+21.What is last epoch id in journal node?
+
+Ans:
+
+22.Explain file writing process in HDFS
+
+Ans:
+
+23.What is fencing?
+
+Ans:
+
+Fencing is a process to ensure this property in a cluster. The journal nodes perform this fencing by allowing only one namenode to be the writer at a time. The standby namenode takes the responsibility of writing to the journal nodes and prohibit any other namenode to remain active.
+
+24.What is the command to get kerberos ticket?
+
+Ans:kinit
+
+1. What is HBase used as?
+
+a. Tool for Random and Fast Read/Write operations in Hadoop
+
+b. MapReduce wrapper
+
+c. Hadoop SQL interface
+
+d. Fast MapReduce layer in Hadoop
+
+2. Hive can be used as?
+
+a. Hadoop query engine
+
+b. Small Batch Processing framework
+
+c. Hadoop SQL interface
+
+d. both (a) and ©
+
+3. Where is the HDFS replication factor controlled?
+
+a. mapred-site.xml
+
+b. yarn-site.xml
+
+c. core-site.xml
+
+d. hdfs-site.xml
+
+4. Hive data models represent
+
+a. Table in HbaseStorage
+
+b. Table in HiveStorage
+
+c. Directories in HDFS
+
+d. None of the above
+
+5. The number of maps is usually driven by the total size of?
+
+a. outputs
+
+b. tasks
+
+c. inputs
+
+d. None of the mentioned
+
+6. Which of the following are true for Hadoop Pseudo Distributed Mode?
+
+a. It runs on multiple machines
+
+b. Runs on multiple machines without any daemons
+
+c. Runs on Single Machine with all daemons
+
+d. Runs on Single Machine without all daemons
+
+7. Which of the following is a column-oriented database that runs on top of HDFS:
+
+a. Hive
+
+b. Sqoop
+
+c. HBase
+
+d. Flume
+
+8. Which of the following command is used to check for various inconsistencies?
+
+a. zkfc
+
+b. fs
+
+c. fsck
+
+d. Fetchdt
+
+9. Which command is used to show all the Hadoop daemons that are running on the machine?
+
+a. distcp
+
+b. jps
+
+c. Fsck
+
+10. It is necessary to default all the properties in Hadoop config files.
+
+a. True
+
+b. False
+
+11. Which of the following is not a valid Hadoop config file?
+
+a. core-default.xml
+
+b. hdfs-default.xml
+
+c. hadoop-default.xml
+
+d. mapred-default.xml
+
+12. Hadoop is a framework that works with a variety of related tools. Common cohorts include:
+
+a. MapReduce, Hive and HBase
+
+b. MapReduce, MySQL and Google Apps
+
+c. MapReduce, Hummer and Iguana
+
+d. MapReduce, Heron and Trumpet
+
+13. What does “Velocity” in Big Data mean?
+
+a. Speed of input data generation b. Speed of individual machine processors c. Speed of ONLY storing data d. Speed of storing and processing data
+
+14. What is the default namenode server port number?
+
+a. 50070
+
+b. 50020
+
+c. 50010
+
+d. 50040
+
+15. Which hadoop command does this - copy file from your computer's disk to hdfs file system?
+
+a. hdfs -fs copyFromlocal
+
+b. hdfs -fs cp
+
+c. hdfs -mv
+
+d. none of the abov
