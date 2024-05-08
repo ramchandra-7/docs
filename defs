@@ -1,0 +1,91 @@
+Definitions: 
+
+ 
+
+Docker: 
+
+Docker is a containerization platform that allows developers to package applications and their dependencies into standardized units called containers. 
+
+With Docker, developers can create, deploy, and run applications consistently across different environments, from development to production. 
+
+Docker provides tools for building, managing, and sharing container images, making it easier to distribute and deploy applications as self-contained units. 
+
+ 
+
+ 
+
+ 
+
+Kubernetes (k8s): 
+
+Kubernetes is an open-source container orchestration platform that automates the deployment, scaling, and management of containerized applications. 
+
+With Kubernetes, developers can deploy and manage containerized applications across a cluster of machines, ensuring high availability, scalability, and fault tolerance. 
+
+Kubernetes abstracts away the underlying infrastructure and provides features such as service discovery, load balancing, and rolling updates, making it easier to deploy and manage containerized applications at scale. 
+
+Key Differences: 
+
+Scope: Docker primarily focuses on containerization—packaging and running applications in containers. Kubernetes, on the other hand, focuses on container orchestration—managing and scaling containerized applications across a cluster of machines. 
+
+Abstraction Level: Docker operates at the level of individual containers, providing tools for building, managing, and running containers. Kubernetes operates at a higher level of abstraction, managing clusters of containers and providing features for orchestrating containerized applications. 
+
+Features: While Docker provides features for building, managing, and sharing container images, Kubernetes provides features for deploying, scaling, and managing containerized applications, including service discovery, load balancing, and automatic scaling. 
+
+Use Cases: Docker is often used by developers to package and run applications locally or in development environments. Kubernetes is used by DevOps teams to deploy and manage containerized applications in production environments, providing features for scaling, resilience, and automation. 
+
+In summary, Docker is a containerization platform for building and running containers, while Kubernetes is a container orchestration platform for managing and scaling containerized applications across a cluster of machines. While they serve different purposes, they can also be used together, with Kubernetes orchestrating Docker containers. 
+
+ 
+
+Hadoop is an open-source software framework that is used for storing and processing large amounts of data in a distributed computing environment. It is designed to handle big data and is based on the MapReduce programming model, which allows for the parallel processing of large datasets. 
+
+ 
+
+ 
+
+The Hadoop architecture is designed to handle the storage and processing of large datasets across distributed clusters of commodity hardware. It consists of several key components that work together to provide scalability, fault tolerance, and high performance. Here's an overview of the Hadoop architecture: 
+
+Hadoop Distributed File System (HDFS): 
+
+HDFS is the primary storage component of Hadoop. It is a distributed file system that provides reliable and scalable storage for large volumes of data across a cluster of machines. 
+
+HDFS follows a master/slave architecture: 
+
+NameNode: The master node that manages metadata and coordinates data storage and retrieval. It keeps track of file system metadata such as file names, permissions, and file block locations. 
+
+DataNodes: The slave nodes that store the actual data blocks. They are responsible for serving read and write requests from clients and replicating data blocks for fault tolerance. 
+
+Yet Another Resource Negotiator (YARN): 
+
+YARN is the resource management and job scheduling component of Hadoop. It separates the resource management and job scheduling functionalities from the MapReduce processing engine, allowing multiple data processing frameworks to run on the same cluster. 
+
+YARN consists of two main components: 
+
+ResourceManager: The master node that manages cluster resources and allocates them to different applications. 
+
+NodeManager: The slave node agent responsible for managing resources (CPU, memory) on individual nodes and executing application containers. 
+
+MapReduce: 
+
+MapReduce is a programming model and processing engine for parallel data processing in Hadoop. It allows users to write distributed data processing applications to analyze large datasets. 
+
+MapReduce jobs are divided into map and reduce tasks: 
+
+Map tasks: Process input data in parallel and produce intermediate key-value pairs. 
+
+Reduce tasks: Aggregate and process intermediate key-value pairs to produce the final output. 
+
+Hadoop Ecosystem: 
+
+Hadoop has a rich ecosystem of related projects and tools that extend its capabilities for data processing, storage, analytics, and more. These projects include Apache Hive, Apache Pig, Apache HBase, Apache Spark, Apache Kafka, and many others. 
+
+These ecosystem components provide additional functionality and integration with other systems, enabling a wide range of use cases and applications. 
+
+Overall, the Hadoop architecture provides a scalable and reliable platform for storing, processing, and analyzing large datasets across distributed clusters of commodity hardware. Its modular design and ecosystem of tools make it suitable for a variety of big data applications and use cases. 
+
+ 
+
+ 
+
+ 
