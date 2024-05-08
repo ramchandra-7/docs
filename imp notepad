@@ -1,0 +1,1107 @@
+snote pad files: 
+
+ 
+
+cde spark submit --class org.apache.spark.examples.SparkPi /opt/cloudera/parcels/CDH-7.2.2-1.cdh7.2.2.p2.7383171/jars/spark-examples_2.11-2.4.5.7.2.2.2-1.jar 
+
+ 
+
+ 
+
+cdp datalake backup-datalake-status --datalake-name arch-dev-datalake --backup-id 49dff27e-08d9-49bd-959d-e2bc206ebc94 
+
+  
+
+cdp datalake sync-component-versions-from-cm --datalake-name arch-dev-datalake 
+
+  
+
+cdp datahub sync-cluster --cluster-name codep-pd-eng  
+
+  
+
+  
+
+cdp datalake list-datalake-backups --datalake-name arch-dev-datalake 
+
+  
+
+  
+
+cdp datahub sync-component-versions-from-cm --datahub-name [datahub name] 
+
+  
+
+cdp datahub sync-component-versions-from-cm --datahub-name arch-prod-storage 
+
+  
+
+:7183/cmf/localLogin 
+
+  
+
+https://arch-prod-storage-master0.arch-pro.ug7a-jg6a.cloudera.site:7183/cmf/localLogin 
+
+  
+
+https://arch-dev-backups-leader0.arch-dev.l6rn-zj16.cloudera.site:7183/cmf/localLogin 
+
+  
+
+  
+
+/opt/cloudera/cm-agent/bin/supervisorctl -c /var/run/cloudera-scm-agent/supervisor/supervisord.conf 
+
+ 
+
+ 
+
+ 
+
+ 
+
+cdp datalake backup-datalake-status --datalake-name arch-dev-datalake --backup-id 49dff27e-08d9-49bd-959d-e2bc206ebc94 
+
+  
+
+cdp datalake sync-component-versions-from-cm --datalake-name arch-dev-datalake 
+
+  
+
+cdp datahub sync-cluster --cluster-name codep-pd-eng  
+
+  
+
+  
+
+cdp datalake list-datalake-backups --datalake-name arch-dev-datalake 
+
+  
+
+cdp datahub sync-component-versions-from-cm --datahub-name 
+
+  
+
+cdp datahub sync-component-versions-from-cm --datahub-name [datahub name] 
+
+  
+
+cdp datahub sync-component-versions-from-cm --datahub-name arch-prod-storage 
+
+  
+
+:7183/cmf/localLogin 
+
+  
+
+https://arch-prod-storage-master0.arch-pro.ug7a-jg6a.cloudera.site:7183/cmf/localLogin 
+
+  
+
+https://arch-dev-backups-leader0.arch-dev.l6rn-zj16.cloudera.site:7183/cmf/localLogin 
+
+  
+
+  
+
+/opt/cloudera/cm-agent/bin/supervisorctl -c /var/run/cloudera-scm-agent/supervisor/supervisord.conf 
+
+ 
+
+ 
+
+ 
+
+cde resources 
+
+  
+
+curation_automated_testing 
+
+  
+
+content: 
+
+pandas 
+
+requests 
+
+neo4j 
+
+  
+
+  
+
+python_packages 
+
+contents: 
+
+  
+
+uuid 
+
+regex 
+
+requests 
+
+neo4j 
+
+  
+
+  
+
+pyspark_hulk_env_resource 
+
+contents: 
+
+  
+
+  
+
+boto3 
+
+numpy 
+
+requests 
+
+kubectl cluster-info dump 
+
+ 
+
+ 
+
+keytool -import -keystore keystore -alias "nabu_certs" -file nabu.crt -storepass changeit -trustcacerts -noprompt 
+
+  
+
+  
+
+  
+
+keytool -importcert -keystore keystore -file codep-pd-environment.crt -alias "cdp_cert" -storepass changeit -trustcacerts -noprompt 
+
+  
+
+  
+
+  
+
+keytool -importkeystore -srckeystore $JAVA_HOME/jre/lib/security/cacerts -destkeystore keystore -srcstorepass changeit -deststorepass changeit -trustcacerts –noprompt 
+
+ 
+
+https://impala.apache.org/docs/build/html/topics/impala_reserved_words.html 
+
+ 
+
+11-08 18:34] Pavan Yenikapati 
+
+[18:21] Vinay Peram 
+
+cd /usr/lib/systemd/system/ 
+
+mkdir mosquitto.service.d 
+
+cd mosquitto.service.d/ 
+
+vi file_limits.conf 
+
+--------------- 
+
+[Service] 
+
+LimitNOFILE=65536 
+
+---------------- 
+
+systemctl daemon-reload 
+
+service mosquitto restart 
+
+service mosquitto status 
+
+cat /proc/30730/limits 
+
+  
+
+https://access.redhat.com/solutions/1257953 
+
+How to set limits for services in RHEL 7 and systemd - Red Hat 
+
+How can I set the limits for services started at boot time via systemd? Limits set in /etc/security/limits.conf or /etc/security/limits.d/*.conf are ignored. 
+
+ 
+
+/etc/kubernetes/pki/apiserver.crt 
+
+  
+
+  
+
+openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout 
+
+  
+
+  
+
+/etc/kubernetes/pki/etcd/ca.crt 
+
+openssl x509 -in /etc/kubernetes/pki/ca.crt -text –noout 
+
+ 
+
+ 
+
+4+ years experienced in implementation of Cloudera based 
+
+solutions on both Cloud and On-prem platforms and have a 
+
+hands-on experience in Linux administration. 1+ years 
+
+experience on kubernetes administration. I am also a AWS 
+
+certified solution architect associate . Worked on 
+
+Performance analysis and system tuning activities. I have 
+
+comprehensive knowledge on Hadoop infrastructure, Kafka, 
+
+Hive, Impala, Cluster Concepts and Cloudera Infrastructure 
+
+experience, kubernetes components,troubleshooting and 
+
+architecture. well versed with AWS elements such as EC2, 
+
+S3, IAM, VPC, Security Groups, RDS. 
+
+  
+
+  
+
+4+ years experienced in implementation of Cloudera based 
+
+solutions on both Cloud and On-prem platforms and have a 
+
+hands-on experience in Linux administration. 1+ years 
+
+experience on kubernetes administration 
+
+ 
+
+curl -k --negotiate -u : "https://arch-dev-tellic-worker20.arch-dev.l6rn-zj16.cloudera.site:8985/solr/admin/collections?action=DELETEREPLICA&collection=evidence&shard=shard5&replica=core_node19" 
+
+  
+
+  
+
+  
+
+curl -k --negotiate -u : "https://arch-dev-tellic-worker20.arch-dev.l6rn-zj16.cloudera.site:8985/solr/admin/collections?action=ADDREPLICA&collection=evidence&shard=shard5 
+
+ 
+
+disable autosuspend off unte ante enabled unatu 
+
+ 
+
+things we can implement: 
+
+  
+
+job autoscaling  
+
+https://docs.cloudera.com/data-engineering/cloud/overview/topics/cde-auto-scaling.html  
+
+  
+
+ACLS 
+
+https://docs.cloudera.com/data-engineering/cloud/deployment-architecture/topics/cde-general-scaling.html 
+
+  
+
+about spot in cde 
+
+https://docs.cloudera.com/data-engineering/cloud/cost-management/topics/cde-spot-instances.html 
+
+  
+
+creating sample job: 
+
+https://docs.cloudera.com/data-engineering/cloud/manage-jobs/topics/cde-load-example-jobs.html 
+
+  
+
+access s3 data from cde 
+
+https://docs.cloudera.com/data-engineering/cloud/manage-jobs/topics/cde-access-data-s3.html 
+
+  
+
+backing up jobs and resources: 
+
+https://docs.cloudera.com/data-engineering/cloud/backup-restore/topics/cde-backup-jobs.html 
+
+ 
+
+ 
+
+You must authenticate your Docker client to your private registry so that you can use the docker push and docker pull commands to push and pull images to and from the repositories in that registry.  
+
+  
+
+The AWS CLI get-login-password command simplifies this by retrieving and decoding the authorization token which you can then pipe into a docker login command to authenticate.  
+
+  
+
+  
+
+  
+
+Authenticate your Docker client to the Amazon ECR registry to which you intend to push your image. Authentication tokens must be obtained for each registry used, and the tokens are valid for 12 hours.   
+
+  
+
+To authenticate Docker to an Amazon ECR registry, run the aws ecr get-login-password command. When passing the authentication token to the docker login command, use the value AWS for the username and specify the Amazon ECR registry URI you want to authenticate to. If authenticating to multiple registries, you must repeat the command for each registry.  
+
+  
+
+  
+
+  
+
+aws ecr get-login-password --region region | docker login --username AWS --password-stdin aws_account_id.dkr.ecr.region.amazonaws.com  
+
+  
+
+  
+
+  
+
+docker images  
+
+  
+
+You can identify an image with the repository:tag value or the image ID in the resulting command output.  
+
+  
+
+Tag your image with the Amazon ECR registry, repository, and optional image tag name combination to use. The registry format is aws_account_id.dkr.ecr.region.amazonaws.com. The repository name should match the repository that you created for your image. If you omit the image tag, we assume that the tag is latest.  
+
+  
+
+The following example tags a local image with the ID e9ae3c220b23 as aws_account_id.dkr.ecr.region.amazonaws.com/my-repository:tag.  
+
+  
+
+docker tag e9ae3c220b23 aws_account_id.dkr.ecr.region.amazonaws.com/my-repository:tag  
+
+  
+
+Push the image using the docker push command:  
+
+  
+
+docker push aws_account_id.dkr.ecr.region.amazonaws.com/my-repository:tag  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+docker tag 703145693148.dkr.ecr.ap-south-1.amazonaws.com/$i:$3 253124472411.dkr.ecr.us-east-1.amazonaws.com/$i:$3  
+
+  
+
+docker push 253124472411.dkr.ecr.us-east-1.amazonaws.com/$i:$3 
+
+ 
+
+ANALYZE TABLE test1 COMPUTE STATISTICS; 
+
+  
+
+DESCRIBE EXTENDED TABLE1; 
+
+ 
+
+https://docs.cloudera.com/documentation/enterprise/6/6.3/topics/impala_troubleshooting.html 
+
+https://data-flair.training/blogs/impala-troubleshooting-performance-tuning/ 
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/index.html 
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/impala-planning/topics/impala-schema-design.html 
+
+ 
+
+ 
+
+ 
+
+cdw runtime: 
+
+On public clouds, the Hive warehouse that stores Hive data is located in an object store, such as S3, by default. In the cloud, Hive uses HDFS merely for storing temporary files. The Hive Metastore (HMS) stores the schema for Hive tables. HMS uses a pre-installed MySQL database. You perform little, or no, configuration of HMS in the cloud. 
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/hive-introduction/topics/hive_whats_new_in_this_release_hive.html 
+
+  
+
+CDP does not support the following features that were available in HDP and CDH platforms: 
+
+  
+
+CREATE TABLE that specifies a managed table location 
+
+Do not use the LOCATION clause to create a managed table. Hive assigns a default location in the warehouse to managed tables. 
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/hive-introduction/topics/hive_optimizing_data_warehouse.html 
+
+  
+
+Hive uses Apache Tez to execute queries internally. Apache Tez provides the following execution modes: 
+
+Container mode 
+
+Every time you run a Hive query, Tez requests a container from YARN. 
+
+  
+
+LLAP mode 
+
+Every time you run a Hive query, Tez asks the LLAP daemon for a free thread, and starts running a fragment. 
+
+  
+
+Apache Tez provides the framework to run a job that creates a graph with vertexes and tasks. SQL semantics for deciding the query physical plan, which identifies how to execute the query in a distributed fashion, is based on Apache Tez. The entire execution plan is created under this framework. SQL syntax in Hive is the same irrespective of execution engine (mode) used in Hive. 
+
+  
+
+Apache Tez does not have to start from the ground up, requesting a container and waiting for a JVM, to run a fragment in LLAP mode. LLAP mode provides dedicated capacity. Caching is automated. The primary difference between LLAP mode and container mode, is that in LLAP mode the LLAP executors are used to run query fragments. 
+
+  
+
+In Cloudera Data Warehouse (CDW) Public Cloud, the Hive execution mode is LLAP. In Cloudera Data Hub on CDP Public Cloud and CDP Private Cloud Base, the Hive execution mode is container, and LLAP mode is not supported. When Apache Tez runs Hive in container mode, it has traditionally been called Hive on Tez. 
+
+  
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/hive-introduction/topics/hive_content_roadmap.html 
+
+  
+
+IMPALA 
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/impala-overview/topics/impala-overview.html 
+
+  
+
+User applications send SQL queries to Impala through ODBC or JDBC, which provide standardized querying interfaces. The user application may connect to any impalad in the cluster. This impalad becomes the coordinator for the query. 
+
+Impala parses the query and analyzes it to determine what tasks need to be performed by impalad instances across the cluster. Execution is planned for optimal efficiency. 
+
+Storage services are accessed by local impalad instances to provide data. 
+
+Each impalad returns data to the coordinating impalad, which sends these results to the client 
+
+  
+
+Impala catalogd 
+
+The Catalog Server relays the metadata changes from Impala SQL statements to all the Impala daemons in a cluster. The catalog service avoids the need to issue REFRESH and INVALIDATE METADATA statements when the metadata changes are performed by statements issued through Impala. 
+
+Impala coordinator 
+
+A few of the key functions that an Impala coordinator performs are: 
+
+  
+
+Reads and writes to data files. 
+
+  
+
+Accepts queries transmitted from the impala-shell command, Hue, JDBC, or ODBC. 
+
+  
+
+Parallelizes the queries and distributes work across the cluster. 
+
+  
+
+It is in constant communication with StateStore, to confirm which executors are healthy and can accept new work. Based on the health information it receives it assigns tasks to the executors. It also receives broadcast messages from the Catalog Server daemon whenever a cluster creates, alters, or drops any type of object, or when an INSERT or LOAD DATA statement is processed through Impala. It also communicates to Catalog Server daemon to load table metadata. 
+
+  
+
+Impala executor 
+
+A few of the key functions that an Impala executor performs are: 
+
+  
+
+Executes the queries and transmits query results back to the central coordinator. 
+
+  
+
+Also transmits intermediate query results. 
+
+  
+
+Depending on the size and the complexity of your queries you can select the number of executor nodes that are needed to run a typical query in your workloads. For more information on the executor groups and recommendations on sizing your virtual warehouse to handle queries that must be run in your workloads concurrently, see Impala auto-scaling on public clouds. 
+
+  
+
+Impala statestored 
+
+The Impala StateStore checks on the health of all Impala daemons in a cluster, and continuously relays its findings to each of those daemons. If an Impala daemon goes offline due to hardware failure, network error, software issue, or other reason, the StateStore informs all the other Impala daemons so that future queries can avoid making requests to the unreachable Impala daemon. 
+
+  
+
+Components available for diagnostic purpose only 
+
+The following components are read-only, and available only to view for diagnostic purposes. The properties listed under them are not tunable. 
+
+  
+
+Impala autoscaler 
+
+One of the core Impala Virtual Warehouse components is Impala autoscaler. Impala autoscaler is in constant communication with coordinators and executors to determine when more or fewer compute resources are needed, given the incoming query load. When the autoscaler detects an imbalance in resources, it sends a request to the Kubernetes framework to increase or decrease the number of executor groups in the Virtual Warehouse, thereby right-sizing the amount of resources available for queries. This ensures that workload demand is met without wasting cloud resources. 
+
+  
+
+Impala proxy 
+
+Impala Proxy is a small footprint reverse proxy that will forward every http client request to the Coordinator endpoint. 
+
+  
+
+When you create an Impala warehouse with the 'allow coordinator shutdown' option a proxy 'impala proxy' is created to act as a connection endpoint to the impala clients. This option when enabled allows Impala coordinators to automatically shut down during idle periods. If the coordinator has shut down because of idle period, and if there is a request from a client when the coordinator is not running, impala proxy triggers the coordinator to start. So the proxy acts as a layer between the clients and the coordinator so that the clients connected to the VW do not time out when 
+
+  
+
+  
+
+Impala autoscaler 
+
+One of the core Impala Virtual Warehouse components is Impala autoscaler. Impala autoscaler is in constant communication with coordinators and executors to determine when more or fewer compute resources are needed, given the incoming query load. When the autoscaler detects an imbalance in resources, it sends a request to the Kubernetes framework to increase or decrease the number of executor groups in the Virtual Warehouse, thereby right-sizing the amount of resources available for queries. This ensures that workload demand is met without wasting cloud resources. 
+
+  
+
+Impala proxy 
+
+Impala Proxy is a small footprint reverse proxy that will forward every http client request to the Coordinator endpoint. 
+
+  
+
+When you create an Impala warehouse with the 'allow coordinator shutdown' option a proxy 'impala proxy' is created to act as a connection endpoint to the impala clients. This option when enabled allows Impala coordinators to automatically shut down during idle periods. If the coordinator has shut down because of idle period, and if there is a request from a client when the coordinator is not running, impala proxy triggers the coordinator to start. So the proxy acts as a layer between the clients and the coordinator so that the clients connected to the VW do not time out when the coordinator starts up. 
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/impala-planning/topics/impala-schema-design.html 
+
+  
+
+Run COMPUTE STATS after loading data 
+
+Impala makes extensive use of statistics about data in the overall table and in each column, to help plan resource-intensive operations such as join queries and inserting into partitioned Parquet tables. Because this information is only available after data is loaded, run the COMPUTE STATS statement on a table after loading or replacing data in a table or partition. 
+
+  
+
+Having accurate statistics can make the difference between a successful operation, or one that fails due to an out-of-memory error or a timeout. When you encounter performance or capacity issues, always use the SHOW STATS statement to check if the statistics are present and up-to-date for all tables in the query. 
+
+  
+
+  
+
+The HMS includes the following Hive metadata about tables that you create: 
+
+A table definition 
+
+Column names 
+
+Data types 
+
+Comments in a central schema repository 
+
+When you use the EXTERNAL keyword in the CREATE TABLE statement, HMS stores the table as an external table. When you omit the EXTERNAL keyword and create a managed table, or ingest a managed table, HMS might translate the table into an external table or the table creation can fail, depending on the table properties. An important table property that affects table transformations is the ACID or Non-ACID table type: 
+
+  
+
+When doing a join query, Impala consults the statistics for each joined table to determine their relative sizes and to estimate the number of rows produced in each join stage. When doing an INSERT into a Parquet table, Impala consults the statistics for the source table to determine how to distribute the work of constructing the data files for each partition. 
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/using-hiveql/topics/hive_hive_3_tables.html 
+
+  
+
+Transactional tables 
+
+Transactional tables are ACID tables that reside in the Hive warehouse. To achieve ACID compliance, Hive has to manage the table, including access to the table data. Only through Hive can you access and change the data in managed tables. Because Hive has full control of managed tables, Hive can optimize these tables extensively. 
+
+  
+
+Hive is designed to support a relatively low rate of transactions, as opposed to serving as an online analytical processing (OLAP) system. You can use the SHOW TRANSACTIONS command to list open and aborted transactions. 
+
+  
+
+Transactional tables in Hive 3 are on a par with non-ACID tables. No bucketing or sorting is required in Hive 3 transactional tables. Bucketing does not affect performance. These tables are compatible with native cloud storage. 
+
+  
+
+Hive supports one statement per transaction, which can include any number of rows, partitions, or tables. 
+
+  
+
+External tables 
+
+External table data is not owned or controlled by Hive. You typically use an external table when you want to access data directly at the file level, using a tool other than Hive. You can also use a storage handler, such as Druid or HBase, to create a table that resides outside the Hive metastore. 
+
+  
+
+  
+
+Hive supports the ANSI-standard information_schema database, which you can query for information about tables, views, columns, and your Hive privileges. The information_schema data reveals the state of the system, similar to sys database data, but in a user-friendly, read-only way. 
+
+A table you create without partitioning puts the data in a single directory. Partitioning divides the data into multiple directories. Queries of one or more columns based on the directories can run faster. Lengthy full table scans are avoided. Only data in the relevant directory is scanned. For example, a school_records table partitioned on a year column, segregates values by year into separate directories. A WHERE condiition such as YEAR=2020, YEAR IN (2020,2019), or YEAR BETWEEN 2001 AND 2010 scans only the data in the appropriate directory to resolve the query. Using partitions typically improves query performance. 
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/hive-performance-tuning/topics/hive_maximize_storage_resources_using_orc.html 
+
+  
+
+You can conserve storage in a number of ways, but using the Optimized Row Columnar (ORC) file format for storing Apache Hive data is most effective. ORC is the default storage for Hive data. 
+
+  
+
+A cost-based optimizer (CBO) generates efficient query plans. Hive does not use the CBO until you generate column statistics for tables. By default, Hive gathers only table statistics. You need to configure Hive to enable gathering of column statistics. 
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/hive-cbo-in-hive/topics/hive_cost_based_optimizer_overview.html 
+
+  
+
+The CBO, powered by Apache Calcite, is a core component in the Hive query processing engine. The CBO optimizes plans for executing a query, calculates the cost, and selects the least expensive plan to use. In addition to increasing the efficiency of execution plans, the CBO conserves resources. 
+
+  
+
+query execution steps: 
+
+  
+
+Pre-execution and DAG construction: It is the first phase of query execution and is executed on the Hive engine. It constitutes the time taken to compile, parse, and build the Directed Acyclic Graph (DAG) for the next phase of the query execution. 
+
+  
+
+DAG submission: It is the second phase in which the DAG that was generated in Hive is submitted to the Tez engine for execution. 
+
+  
+
+DAG runtime: It shows the time taken by the Tez engine to execute the DAG. 
+
+  
+
+Post-execution: It is the last phase of query execution in which the files in S3/ABFS are moved or renamed 
+
+ 
+
+jars always contains compiled code 
+
+compiling is chanfing english to byte code 
+
+  
+
+raw scala is just passing uncompiled code instead of passing jars to a job 
+
+ 
+
+ 
+
+https://pig.abbvienet.com/arch/aws-native-operations/tree/ecr-repo-creation--> To create new ecr repo 
+
+  
+
+  
+
+  
+
+aws ecr get-login-password --region us-east-1 | cut -f6 -d ' ' --> To get ecr login token to access ecr repo(user:sparkbot_svc) 
+
+  
+
+  
+
+docker login --username AWS 771775635613.dkr.ecr.us-east-1.amazonaws.com --> To login ecr and pull and push images. It will ask for Docker registry token. Enter the token which we got in step2 
+
+  
+
+  
+
+docker pull 771775635613.dkr.ecr.us-east-1.amazonaws.com/cde-spark:1.0 
+
+  
+
+  
+
+  
+
+docker tag 771775635613.dkr.ecr.us-east-1.amazonaws.com/cde-spark:1.0 253124472411.dkr.ecr.us-east-1.amazonaws.com/cde-spark:1.0 
+
+  
+
+  
+
+aws ecr get-login-password --region us-east-1 | cut -f6 -d ' ' 
+
+  
+
+  
+
+docker login --username AWS 253124472411.dkr.ecr.us-east-1.amazonaws.com 
+
+  
+
+  
+
+docker push 253124472411.dkr.ecr.us-east-1.amazonaws.com/cde-spark:1.0 
+
+------------------------------------------------------------------------------------- 
+
+  
+
+  
+
+cde resource create --name deps --type custom-runtime-image --image 253124472411.dkr.ecr.us-east-1.amazonaws.com/cde-spark:1.0 --image-engine spark2 --vcluster-endpoint https://7z7c4dgm.cde-l8d6smmm.arch-qa.l6rn-zj16.cloudera.site/dex/api/v1 --user yenikpx 
+
+  
+
+  
+
+  
+
+cde resource create --name deps --type custom-runtime-image --image 253124472411.dkr.ecr.us-east-1.amazonaws.com/cde-spark:1.0 --image-engine spark3 --vcluster-endpoint https://98q9hs4v.cde-l8d6smmm.arch-qa.l6rn-zj16.cloudera.site/dex/api/v1 --user yenikpx 
+
+  
+
+  
+
+  
+
+cde credential create --name qa-ecr --type docker-basic --docker-server 253124472411.dkr.ecr.us-east-1.amazonaws.com/cde-spark:1.0 --docker-username AWS --vcluster-endpoint https://7z7c4dgm.cde-l8d6smmm.arch-qa.l6rn-zj16.cloudera.site/dex/api/v1 --user yenikpx 
+
+  
+
+  
+
+cde credential create --name qa-ecr --type docker-basic --docker-server 253124472411.dkr.ecr.us-east-1.amazonaws.com/cde-spark:1.0 --docker-username AWS --vcluster-endpoint https://98q9hs4v.cde-l8d6smmm.arch-qa.l6rn-zj16.cloudera.site/dex/api/v1 --user yenikpx 
+
+---------------------------------------------------------------------- 
+
+cde credential list --vcluster-endpoint https://7z7c4dgm.cde-l8d6smmm.arch-qa.l6rn-zj16.cloudera.site/dex/api/v1 --user yenikpx 
+
+  
+
+  
+
+cde credential delete --name deps-cred-1 --vcluster-endpoint https://7z7c4dgm.cde-l8d6smmm.arch-qa.l6rn-zj16.cloudera.site/dex/api/v1 --user yenikpx 
+
+  
+
+  
+
+cde credential list --vcluster-endpoint https://98q9hs4v.cde-l8d6smmm.arch-qa.l6rn-zj16.cloudera.site/dex/api/v1 --user yenikpx --user yenikpx 
+
+  
+
+  
+
+cde credential delete --name deps-cred --vcluster-endpoint https://98q9hs4v.cde-l8d6smmm.arch-qa.l6rn-zj16.cloudera.site/dex/api/v1  --user yenikpx 
+
+ 
+
+show table stats db.tablename 
+
+run count(*) and check query profile 
+
+  
+
+compute stats 
+
+  
+
+https://docs.cloudera.com/documentation/enterprise/6/6.3/topics/impala_troubleshooting.html 
+
+https://data-flair.training/blogs/impala-troubleshooting-performance-tuning/ 
+
+  
+
+  
+
+  
+
+https://docs.cloudera.com/cdw-runtime/cloud/impala-overview/topics/impala-cdw-components.html 
+
+  
+
+  
+
+https://docs.cloudera.com/documentation/enterprise/6/6.3/topics/impala_components.html 
+
+  
+
+  
+
+https://docs.cloudera.com/documentation/enterprise/6/6.3/topics/hive_intro.html 
+
+  
+
+https://docs.cloudera.com/documentation/enterprise/6/6.3/topics/impala_timeouts.html 
+
+ 
+
+ 
+
+to check if rds is encrypted or not 
+
+  
+
+  
+
+  
+
+select datname, usename, ssl, client_addr from pg_stat_ssl inner join pg_stat_activity on pg_stat_ssl.pid = pg_stat_activity.pid where ssl is true and usename<>'rdsadmin'; 
+
+ 
+
+ 
+
+cde spark submit <file_name \ 
+
+--conf spark.app.name=" " \ 
+
+--packages "com.github.music-of-the-ainur:almaren-framework_2.11:0.9.1-2.4,com.oracle.database.jdbc:ojdbc6:11.2.0.4,com.databricks:spark-xml_2.11:0.13.0" \ 
+
+--conf spark.dynamicAllocation.enabled=false \ 
+
+--conf spark.sql.shuffle.partitions=40 \ 
+
+--conf spark.driver.maxResultSize=1G \ 
+
+--driver-memory 20G \ 
+
+--executor-cores 5 \ 
+
+--num-executors 2 \ 
+
+--executor-memory 40G \ 
+
+--vcluster-endpoint https://zkgb75wz.cde-8rpbdbpf.arch-pro.ug7a-jg6a.cloudera.site/dex/api/v1 \ 
+
+--credentials-file /opt/nabu/nabu-spark-bots/conf/credentials 
+
+  
+
+  
+
+  
+
+  
+
+spark-shell --master yarn --deployment-mode cluster 
+
+  
+
+  
+
+spark-shell --master local 
+
+  
+
+  
+
+  
+
+spark-shell --master yarn --packages "com.github.music-of-the-ainur:almaren-framework_2.11:0.5.0-2.4" --driver-memory 30G --executor-cores 5 --num-executors 3 --executor-memory 20G --conf spark.dynamicAllocation.enabled=false 
+
+ 
+
+sudo -i 
+
+source activate_salt_env 
+
+salt '*' cmd.run 'ipactl status' 2>/dev/null 
+
+salt '*' cmd.run 'export CUSTOM_DATE="^\[$(date +%d/%b/%Y)" && grep "${CUSTOM_DATE}" /var/log/dirsrv/*/errors' | tee -a /tmp/All_FreeIPA_ErrorLog_$(hostname -f)_$(date +"%Y%m%d%H%M%S").out 
+
+ 
+
+On the transit gateway, we have a VPC attachment tgw-attach-0041cde0ec7239f68 which is associated to the route table tgw-rtb-0c4f0989bf64c773b. 
+
+In this transit gateway route table, we have a default route i.e. 0.0.0.0/0 route towards the DirectConnect attachment tgw-attach-0ce4e07d6cc8af5d2. 
+
+  
+
+Therefore, All the traffic is going to the On-premise via the Direct Connect.	 
+
+ 
+
+1. create a new aurora cluster. 
+
+2. take snapshot 
+
+3. encrypt and recreate 
+
+4. check if we are able to recover it as a single instance or a cluster 
+
+  
+
+  
+
+aws rds create-db-snapshot --db-instance-identifier noencryptrds-instance-1 --db-snapshot-identifier noencryptrds-instance-1-ss 
+
+  
+
+aws rds create-db-cluster  
+
+    --db-cluster-identifier sample-pg-cluster \ 
+
+    --engine aurora-postgresql \ 
+
+    --master-username master \ 
+
+    --master-user-password secret99 \ 
+
+    --db-subnet-group-name default \ 
+
+    --vpc-security-group-ids sg-0b9130572daf3dc16 
+
+ 
+
+ 
+
+aws rds create-db-cluster-snapshot --db-cluster-identifier noencryptrds --db-cluster-snapshot-identifier noencryptrds-ss  
+
+  
+
+aws rds copy-db-snapshot --source-db-snapshot-identifier noencryptrds-ss --target-db-snapshot-identifier encryptrds-ss --kms-key-id a1b7addf-ead5-4770-920a-8d3be5934016 
+
+  
+
+aws rds copy-db-cluster-snapshot --source-db-cluster-snapshot-identifier noencryptrds-ss --target-db-cluster-snapshot-identifier encryptrds-ss --kms-key-id a1b7addf-ead5-4770-920a-8d3be5934016 
+
+  
+
+aws rds restore-db-cluster-from-snapshot --db-cluster-identifier encryptedrds-test --snapshot-identifier noencryptrds-ss --engine "Aurora PostgreSQL" --kms-key-id a1b7addf-ead5-4770-920a-8d3be5934016 
+
+  
+
+--engine <value> 
+
+--kms-key-id <value> 
+
+--deletion-protection 
+
+  
+
+    aws rds create-db-cluster-snapshot --db-cluster-identifier noencryptrds --db-cluster-snapshot-identifier noencryptrds-ss 
+
+  
+
+  
+
+aws rds restore-db-cluster-from-snapshot --db-cluster-identifier encryptedrds-test --snapshot-identifier noencryptrds-ss --engine aurora-postgresql --kms-key-id a1b7addf-ead5-4770-920a-8d3be5934016 
+
+ 
+
+cdp-freeipa-healthagent.service 
+
+ 
+
+https://www.ibm.com/docs/en/cloud-private/3.2.0?topic=console-namespace-is-stuck-in-terminating-state 
+
+ 
+
+hive 
+
+https://www.analyticsvidhya.com/blog/2022/01/hive-internal-and-external-tables/ 
+
+ 
+
+hdfs dfs -setrep -w 1 -R /hbase/data/default/ 
+
+ 
+
+ 
+
+AH-3328 
+
+curl -k --negotiate -u : "https://$(hostname -f):8985/solr/ranger_audits/select?_=$(date +%s)&fl=evtTime&q=*:*&rows=1&sort=evtTime+asc" 
+
+   80  curl -k --negotiate -u : "https://$(hostname -f):8985/solr/ranger_audits/update?_=$(date +%s)&commitWithin=1000&overwrite=true&wt=json" -H "Content-Type: application/xml" -d '<add><delete><query>evtTime:[2022-08-11T10:05:44.981Z TO 2022-08-21T10:05:44.981Z]</query></delete></add>' 
+
+ 
+
+ 
+
+ 
+
+import cmlapi 
+
+api_url = "https://ml-5d389444-435.arch-pro.ug7a-jg6a.cloudera.site" 
+
+api_key =  'c19124f27159cf0b5b99880fc4cbdfb930a6162725336f64e37196800f1ff150.66c726c3bdad7deb2e11d81932ba98920edecb275c947f52515857cf35523743'  # Can be accessed/generated by going into CML >> Use Settings >> API Keys >> Generate API key 
+
+  
+
+  
+
+https://docs.cloudera.com/machine-learning/cloud/applications/topics/ml-applications-c.html 
+
+https://docs.cloudera.com/machine-learning/cloud/models/topics/ml-creating-and-deploying-a-model.html 
+
+ 
+
+https://www.statology.org/r-check-if-package-is-installed/ 
+
+service curation-bots restart 
+
+service ingestion-bots restart 
+
+service profiling-bots restart 
+
+service indexing-bots restart 
+
+service ingestion-1-bots restart 
+
+ 
+
+cdp datalake list-datalake-backups --datalake-name  arch-prod-green-datalake 
+
+ 
+
+import os 
+
+project = os.environ["AT_PROJECT_LEVEL"] 
+
+print(project) 
+
+user = os.environ["AT_USER_LEVEL"] 
+
+print(user) 
