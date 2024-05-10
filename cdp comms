@@ -1,0 +1,42 @@
+systemctl status cdp-freeipa-healthagent.service
+ 
+ 
+cdp-telemetry doctor ccm status 
+cdp-telemetry doctor ccm report
+cdp-doctor service status
+cdp-doctor network status
+cdp-telemetry doctor ccm status
+ 
+ 
+cdp-telemetry doctor ccm status
+
+ 
+cdp-doctor network status
+
+ 
+systemctl status salt-minion
+systemctl status salt-master
+systemctl status salt-api
+
+ 
+cdp-doctor service status
+ 
+cdp-telemetry doctor ccm report
+ 
+systemctl status cdp-freeipa-healthagent.service
+ 
+and share the below log file.
+ 
+#/cdp/ipahealthagent/ipahealthagent.log log file
+ 
+Please check the IPA status on the unhealthy node
+ipactl status
+ 
+Make sure the Cluster Connectivity related services are RUNNING in the IPA nodes.
+sudo -i
+source activate_salt_env
+salt '*' cmd.run 'cdp-telemetry doctor ccm status' 2>/dev/null
+salt '*' cmd.run 'cdp-doctor network status' 2>/dev/null
+ 
+Please check systemctl status jumpgate-agent.service
+/home/cloudbreak/log.txt on each FreeIPA node.
