@@ -1,0 +1,22 @@
+1. RDD Creation:Imagine you have a large dataset of sales transactions, and you want to analyze it using Spark.
+pythonCopy code# Creating an RDD from a text file containing sales datasales_rdd = sc.textFile("hdfs://sales_data.txt")
+In this example, sales_rdd is an RDD created from a text file containing sales data.
+2. Partitioning:The sales data is divided into partitions. Each partition contains a subset of the data.
+pythonCopy code# Checking the number of partitions in the RDDnum_partitions = sales_rdd.getNumPartitions()print(f"Number of Partitions: {num_partitions}")
+Let's say the RDD is partitioned into 4 partitions.
+3. Transformation and Actions with DAG:Now, you want to perform some transformations and actions on the data. Let's say you want to find the total sales amount for each product.
+pythonCopy code# Transformation: Mapping each line to a (product, sales) pairproduct_sales_pair_rdd = sales_rdd.map(lambda line: (line.split(",")[1], float(line.split(",")[2])))
+# Transformation: Reducing by key to get total sales for each producttotal_sales_per_product_rdd = product_sales_pair_rdd.reduceByKey(lambda x, y: x + y)
+# Action: Collecting the resultsresult = total_sales_per_product_rdd.collect()
+Understanding DAG:In this process, Spark creates a Directed Acyclic Graph (DAG) representing the operations. The DAG guides the execution plan for Spark.
+DAG Stages:
+Stage 1: Reading data from the file into partitions.
+Stage 2: Mapping each line to a (product, sales) pair.
+Stage 3: Reducing by key to calculate total sales for each product.
+Dependency between Stages:
+Stage 2 depends on the output of Stage 1 (Mapping depends on reading).
+Stage 3 depends on the output of Stage 2 (Reducing depends on mapping).
+Summary:
+RDD: sales_rdd is the Resilient Distributed Dataset representing sales data.
+Partitions: The data is divided into logical partitions for parallel processing.
+DAG: The sequence of transformations and actions forms a DAG, optimizing the execution plan.
